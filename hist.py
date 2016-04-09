@@ -33,17 +33,7 @@ while(True):
         frame1 = hist_utils.draw_rects(frame1)
 
     else:
-        hsv = cv2.cvtColor(frame1, cv2.COLOR_BGR2HSV)
-        dst = cv2.calcBackProject([hsv], [0,1], dollar_hist, [0,180,0,256], 1)
-        disc = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11,11))
-        cv2.filter2D(dst, -1, disc, dst)
-
-        ret, thresh = cv2.threshold(dst, 100, 255, 0)
-        thresh = cv2.merge((thresh,thresh, thresh))
-
-        cv2.GaussianBlur(dst, (3,3), 0, dst)
-
-        frame1 = cv2.bitwise_and(frame1, thresh)
+        frame1 = hist_utils.hist_filter(frame1, dollar_hist)
         
     cv2.imshow("frame", frame1)
 

@@ -37,3 +37,16 @@ def get_hist(frame):
     cv2.normalize(hand_hist, hand_hist, 0, 255, cv2.NORM_MINMAX)
     
     return hand_hist
+
+def hist_filter(frame, hist):
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    dst = cv2.calcBackProject([hsv], [0,1], hist, [0,180,0,256], 1)
+    disc = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11,11))
+    cv2.filter2D(dst, -1, disc, dst)
+
+    ret, thresh = cv2.threshold(dst, 100, 255, 0)
+    thresh = cv2.merge((thresh,thresh, thresh))
+
+    cv2.GaussianBlur(dst, (3,3), 0, dst)
+
+    return cv2.bitwise_and(frame, thresh)
