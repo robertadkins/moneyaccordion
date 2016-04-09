@@ -31,7 +31,9 @@ class SynthControl:
         self.midiout = rt.MidiOut()
         ports = self.midiout.get_ports()
         self.midiout.open_port(1)
-        
+
+    def train(self):
+        """ use this to train parameters for MIDI communication """
         raw_input("Press enter to train cutoff ")
         self.adjust_cutoff(0.8)
 
@@ -40,6 +42,7 @@ class SynthControl:
         
         raw_input("Press enter to train volume ")
         self.adjust_vol(0.8)
+        
         
     def destroy(self):
         self.helm.terminate()
