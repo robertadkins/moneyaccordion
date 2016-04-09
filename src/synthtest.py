@@ -6,7 +6,8 @@ synth = sc.SynthControl()
 j = 3
 synth.play_note(j, 1)
 for i in range(200):
-    synth.adjust_mod((math.sin(i * (2 * math.pi) / 5) + 1)/2.0)
+    synth.adjust_mod((math.sin(i * (2 * math.pi) / 5) + 1) / 2.0)
+    synth.adjust_vol((math.sin(i * (2 * math.pi) / 2) + 1) / 2.0)
     if i <= 100:
         synth.adjust_cutoff(i / 100.0 * 0.8)
     time.sleep(0.1)

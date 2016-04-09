@@ -38,6 +38,9 @@ class SynthControl:
         raw_input("Press enter to train mod ")
         self.adjust_mod(0)
         
+        raw_input("Press enter to train volume ")
+        self.adjust_vol(0.8)
+        
     def destroy(self):
         self.helm.terminate()
     
@@ -60,3 +63,6 @@ class SynthControl:
     def adjust_mod(self, val):
         """ val is between 0 and 1 """
         self.midiout.send_message([0xB0, 1, int(val * 127)])
+
+    def adjust_vol(self, val):
+        self.midiout.send_message([0xB0, 2, int(val * 127)])
