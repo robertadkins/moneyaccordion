@@ -1,2 +1,3 @@
-# moneyaccordian
-a dollar bill based accordian
+# moneyaccordion
+a dollar bill based accordion
+$$$
