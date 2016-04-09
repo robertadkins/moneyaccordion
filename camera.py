@@ -26,12 +26,13 @@ while(True):
     diff = cv2.subtract(frame2, frame1)
 
     #for later
-    #diff = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
-    #diff = cv2.adaptiveThreshold(diff, 1, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 3, 0)
+    diff_mod = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
+    diff_mod = cv2.adaptiveThreshold(diff_mod, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 5, 10)
+    diff_mod = cv2.cvtColor(diff_mod, cv2.COLOR_GRAY2RGB)
 
-    res = cv2.bitwise_and(frame2, diff)
+    res = cv2.bitwise_and(frame2, diff_mod)
 
-    cv2.imshow("frame", diff)
+    cv2.imshow("frame", res)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
