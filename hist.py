@@ -10,6 +10,10 @@ import camera
 #easier to measure velocity, can't really measure bend in the dollar
 #plus, finger overlap on the dollar inhibits the ability to recognize the dollar contour
 
+frames = []
+frameCount = 0
+maxFrames = 5
+
 #this should be the camera
 cap = cv2.VideoCapture(0)
 
@@ -22,8 +26,7 @@ dollar_hist = None
 #while(False):
 while(True):
     ret, frame1 = cap.read() #read a frame
-    cv2.namedWindow('frame', cv2.cv.CV_WINDOW_NORMAL)
-    cv2.namedWindow('frame2', cv2.cv.CV_WINDOW_NORMAL)
+    #cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
     
     frame1 = cv2.flip(frame1, 1)
     
@@ -35,13 +38,28 @@ while(True):
         frame1 = hist_utils.draw_rects(frame1)
         cv2.imshow("frame", frame1)
     else:
-        frame1 = camera.diff_frames(frame1)
+        frame1 = camera.diff_frames_blurred(frame1)
         frame1 = hist_utils.hist_filter(frame1, dollar_hist)
-        frame2 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
+        
+        if len(frames) < maxFrames:
+            frames.append(frame1)
+        else:
+            frames[frameCount % maxFrames] = frame1
+        frameCount += 1
+        
+        summedFrame = np.zeros((len(frame1),len(frame1[0]),3))
+        for f in frames:
+            cv2.accumulate(f, summedFrame)
+        
+        summedFrame /= len(frames)
+        summedFrame = summedFrame.astype("uint8")
+        
+        frame2 = cv2.cvtColor(summedFrame, cv2.COLOR_BGR2GRAY)
+        
         ret, framet = cv2.threshold(frame2, 100, 255, 0)
         framet = cv2.morphologyEx(framet, cv2.MORPH_CLOSE, np.ones((2,2),np.uint8), iterations=10)
         #framet1 = np.copy(framet)
-        contours,hierarchy = cv2.findContours(framet, 1, 2)
+        _,contours,hierarchy = cv2.findContours(framet, 1, 2)
         framet = cv2.cvtColor(framet, cv2.COLOR_GRAY2RGB)
         allpts = []
         if len(contours) > 0:
@@ -50,6 +68,7 @@ while(True):
             for cnt in contours:
                 #print cnt.tolist()
                 allpts = allpts + cnt.tolist()
+                cv2.drawContours(framet, cnt, -1, (255,0,0), 3)
 
             #print allpts
             hull = cv2.convexHull(np.array(allpts))
