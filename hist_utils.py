@@ -44,6 +44,8 @@ def hist_filter(frame, hist):
     disc = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11,11))
     cv2.filter2D(dst, -1, disc, dst)
 
+    cv2.imshow("frame2", dst)
+
     ret, thresh = cv2.threshold(dst, 100, 255, 0)
     thresh = cv2.merge((thresh,thresh, thresh))
 

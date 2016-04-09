@@ -22,6 +22,8 @@ dollar_hist = None
 #while(False):
 while(True):
     ret, frame1 = cap.read() #read a frame
+    cv2.namedWindow('frame', cv2.cv.CV_WINDOW_NORMAL)
+    cv2.namedWindow('frame2', cv2.cv.CV_WINDOW_NORMAL)
     
     frame1 = cv2.flip(frame1, 1)
     
@@ -31,13 +33,31 @@ while(True):
             trained_dollar = True
             
         frame1 = hist_utils.draw_rects(frame1)
-
+        cv2.imshow("frame", frame1)
     else:
         frame1 = camera.diff_frames(frame1)
         frame1 = hist_utils.hist_filter(frame1, dollar_hist)
+        frame2 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
+        ret, framet = cv2.threshold(frame2, 100, 255, 0)
+        framet = cv2.morphologyEx(framet, cv2.MORPH_CLOSE, np.ones((2,2),np.uint8), iterations=10)
+        #framet1 = np.copy(framet)
+        contours,hierarchy = cv2.findContours(framet, 1, 2)
+        framet = cv2.cvtColor(framet, cv2.COLOR_GRAY2RGB)
+        allpts = []
+        if len(contours) > 0:
+            #print contours
+            print len(contours)
+            for cnt in contours:
+                #print cnt.tolist()
+                allpts = allpts + cnt.tolist()
+
+            #print allpts
+            hull = cv2.convexHull(np.array(allpts))
+            cv2.drawContours(framet, [hull], -1, (0,255,0), 3)
         
-        
-    cv2.imshow("frame", frame1)
+                  #framet = cv2.cvtColor(framet, cv2.COLOR_GRAY2RGB)
+                  #framet[1] = framet1
+        cv2.imshow("frame", framet)        
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break

@@ -17,6 +17,8 @@ def diff_frames(frame):
     #for later
     diff_mod = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
     diff_mod = cv2.adaptiveThreshold(diff_mod, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 5, 10)
+    #diff_mod = cv2.morphologyEx(framet, cv2.MORPH_CLOSE, np.ones((2,2),np.uint8), iterations=10)
+    #diff_mod = cv2.
     diff_mod = cv2.cvtColor(diff_mod, cv2.COLOR_GRAY2RGB)
 
     res = cv2.bitwise_and(frame, diff_mod)
