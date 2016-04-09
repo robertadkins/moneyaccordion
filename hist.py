@@ -4,7 +4,7 @@ import moneydetector as md
 import time
 import hist_utils
 import numpy as np
-
+import camera
 
 #HEY HEY Maybe we should look into tracking fingers holding the bill rather than the bill itself
 #easier to measure velocity, can't really measure bend in the dollar
@@ -33,7 +33,9 @@ while(True):
         frame1 = hist_utils.draw_rects(frame1)
 
     else:
+        frame1 = camera.diff_frames(frame1)
         frame1 = hist_utils.hist_filter(frame1, dollar_hist)
+        
         
     cv2.imshow("frame", frame1)
 
