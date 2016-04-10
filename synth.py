@@ -10,7 +10,7 @@ class Synth:
 
         self.NUM_NOTES = 8
         
-        self.synth = sc.SynthControl()
+        self.synth = sc.SynthControl(key='B', major=False)
         self.width = screenSizeY
         self.height = screenSizeX
         self.currNote = -1
