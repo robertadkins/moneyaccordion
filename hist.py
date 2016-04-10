@@ -1,4 +1,4 @@
-import numpy as np
+import numpy as npA
 import cv2
 import moneydetector as md
 import time
@@ -43,7 +43,7 @@ while(True):
     frameorig = cv2.flip(frameorig, 1)
     edge = cv2.Canny(grayframe, 100, 200)
     
-    mask = fgbg.apply(frame1)
+    mask = fgbg.apply(frameorig)
     mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
     
     frame1 = cv2.bitwise_and(frameorig, mask)
@@ -51,19 +51,19 @@ while(True):
     
     if not trained_hand:
         if cv2.waitKey(1) & 0xFF == ord('p'):
-            hand_hist = hist_utils.get_hist(frame1)
+            hand_hist = hist_utils.get_hist(frameorig)
             trained_hand = True
             
-        frame1 = hist_utils.draw_rects(frame1, horizontal=false)
-        cv2.imshow("frame", frame1)
+        frame2 = hist_utils.draw_rects(frameorig, horizontal=False)
+        cv2.imshow("frame", frame2)
         
-    if not trained_dollar:
+    elif not trained_dollar:
         start_timer += 1
         if cv2.waitKey(1) & 0xFF == ord('p'):# or start_timer == 100:
-            dollar_hist = hist_utils.get_hist(frame1)
+            dollar_hist = hist_utils.get_hist(frameorig)
             trained_dollar = True
             
-        frame2 = hist_utils.draw_rects(frame1)
+        frame2 = hist_utils.draw_rects(frameorig)
         cv2.imshow("frame", frame2)
     else:
         hist = hist_utils.hist_filter(frameorig, dollar_hist)
@@ -136,10 +136,10 @@ while(True):
         
                   #framet = cv2.cvtColor(framet, cv2.COLOR_GRAY2RGB)
                   #framet[1] = framet1
-        farthest_point = hist_utils.find_hand_farthest_point(frameorig, hand_hist)
+        farthest_point, hand_isolated_frame = hist_utils.find_hand_farthest_point(frameorig, hand_hist)
         if farthest_point is not None:
-            cv2.circle(summedFrame, farthest_point, 5, [0,0,255], -1)
-        cv2.imshow("frame", summedFrame)
+            cv2.circle(hand_isolated_frame, farthest_point, 5, [0,0,255], -1)
+        cv2.imshow("frame", hand_isolated_frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break

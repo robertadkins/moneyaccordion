@@ -60,11 +60,11 @@ def hist_filter(frame, hist):
     return cv2.bitwise_and(frame, thresh)
 
 def find_hand_farthest_point(frame, hist):
-    hand_isolated_frame = hist_filter(frame, hand_hist)
+    hand_isolated_frame = hist_filter(frame, hist)
     
     gray = cv2.cvtColor(hand_isolated_frame, cv2.COLOR_BGR2GRAY)
-	ret, thresh = cv2.threshold(gray, 0, 255, 0)
-	contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    ret, thresh = cv2.threshold(gray, 0, 255, 0)
+    contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
     if contours is not None and len(contours) > 0:
         max_i = 0
@@ -82,7 +82,7 @@ def find_hand_farthest_point(frame, hist):
         
         hull = cv2.convexHull(largest_contour)
         
-        moments = cv2.moments(contour)
+        moments = cv2.moments(largest_contour)
         centroid = None
         if moments['m00'] != 0:
             cx = int(moments['m10']/moments['m00'])
@@ -90,16 +90,16 @@ def find_hand_farthest_point(frame, hist):
             centroid = (cx,cy)
         
         defects = None
-        non_returnpoints_hull = cv2.convexHull(contour, returnPoints=False)
-        if non_returnpoints_hull is not None and len(non_returnpoints_hull) > 3 and len(contour) > 3:
-            defects = cv2.convexityDefects(contour, non_returnpoints_hull)
+        non_returnpoints_hull = cv2.convexHull(largest_contour, returnPoints=False)
+        if non_returnpoints_hull is not None and len(non_returnpoints_hull) > 3 and len(largest_contour) > 3:
+            defects = cv2.convexityDefects(largest_contour, non_returnpoints_hull)
 
         if centroid is not None and defects is not None and len(defects) > 0:   
             s = defects[:,0][:,0]
             cx, cy = centroid
 
-            x = np.array(contour[s][:,0][:,0], dtype=np.float)
-            y = np.array(contour[s][:,0][:,1], dtype=np.float)
+            x = np.array(largest_contour[s][:,0][:,0], dtype=np.float)
+            y = np.array(largest_contour[s][:,0][:,1], dtype=np.float)
 
             xp = cv2.pow(cv2.subtract(x, cx), 2)
             yp = cv2.pow(cv2.subtract(y, cy), 2)
@@ -109,8 +109,14 @@ def find_hand_farthest_point(frame, hist):
 
             if dist_max_i < len(s):
                 farthest_defect = s[dist_max_i]
-                farthest_point = tuple(contour[farthest_defect][0])
+                farthest_point = tuple(largest_contour[farthest_defect][0])
+
+                for cnt in contours:
+                    if cnt is not largest_contour:
+                        cv2.drawContours(hand_isolated_frame, cnt, -1, (255,0,0), 3)
+                    else:
+                        cv2.drawContours(hand_isolated_frame, cnt, -1, (0,255,0), 3)
                 
-                return farthest_point
+                return farthest_point, hand_isolated_frame
             
-    return None
+    return None, None
