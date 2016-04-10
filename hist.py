@@ -40,7 +40,7 @@ cv2.namedWindow('edge', cv2.WINDOW_NORMAL)
 while(True):
     ret, frameorig = cap.read() #read a frame
     grayframe = cv2.cvtColor(frameorig, cv2.COLOR_BGR2GRAY)
-    frameorig = cv2.flip(, 1)
+    frameorig = cv2.flip(frameorig, 1)
     edge = cv2.Canny(grayframe, 100, 200)
     
     mask = fgbg.apply(frame1)
