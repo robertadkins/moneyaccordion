@@ -6,6 +6,7 @@ import numpy as np
 import camera
 from synth import Synth
 import math
+import os.path
 
 #HEY HEY Maybe we should look into tracking fingers holding the bill rather than the bill itself
 #easier to measure velocity, can't really measure bend in the dollar
@@ -23,9 +24,9 @@ fgbg = cv2.BackgroundSubtractorMOG()
 #dollar_image = cv2.imread('7dollar.png', cv2.IMREAD_UNCHANGED)
 
 trained_hand = False
-trained_dollar = False
+trained_dollar = True
 
-pointing_threshold = 20
+pointing_threshold = 50
 
 hand_hist = None
 dollar_hist = None
@@ -41,16 +42,16 @@ def addKeyboard(img):
     xlen = len(img[0])
     ylen = len(img)
 
-    note = 4 - syn.currNote - 1
+    note = syn.NUM_NOTES - syn.currNote - 1
 
     cv2.rectangle(img,(0,0),(xlen,ylen),(0,255,0),3)
 
-    noteboxy = ylen / 3
-    noteboxx = xlen / 3
+    noteboxy = ylen / syn.NUM_NOTES
+    noteboxx = xlen / syn.NUM_NOTES
 
-    cv2.rectangle(img,(0, noteboxy), (xlen, noteboxy*2), (0,255,0), 2)
-    cv2.rectangle(img,(0, noteboxy*2), (xlen, noteboxy*3), (0,255,0), 2)
-    cv2.rectangle(img,(0, noteboxy*3), (xlen, ylen), (0,255,0), 2)
+    for i in range(syn.NUM_NOTES + 1):
+        cv2.rectangle(img,(0, noteboxy * i), (xlen, noteboxy*(i+1)), (0,255,0), 2)
+
     cv2.rectangle(img,(xlen-50, noteboxy*note+20), (xlen-10, noteboxy*(note+1)-20), (0,255,0), -1)
 
 
@@ -65,11 +66,16 @@ while(True):
     mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
 
     frame1 = cv2.bitwise_and(frameorig, mask)
-#    frame1 = frameorig
 
-    if not trained_hand:
+    if os.path.isfile("hand_hist.npy") and not trained_hand:
+        hand_hist = np.load("hand_hist.npy")
+        trained_hand = True
+        frame2 = hist_utils.draw_rects(frameorig, horizontal=False)
+        cv2.imshow("frame", frame2)
+    elif not trained_hand:
         if cv2.waitKey(1) & 0xFF == ord('p'):
             hand_hist = hist_utils.get_hist(frameorig)
+            np.save("hand_hist", hand_hist)
             trained_hand = True
 
         frame2 = hist_utils.draw_rects(frameorig, horizontal=False)

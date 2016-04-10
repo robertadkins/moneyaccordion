@@ -8,11 +8,11 @@ class Synth:
         self.STATE_NOTE = 1
         self.STATE_CHORD = 2
 
-        self.NUM_NOTES = 3
+        self.NUM_NOTES = 8
         
         self.synth = sc.SynthControl()
-        self.width = screenSizeX
-        self.height = screenSizeY
+        self.width = screenSizeY
+        self.height = screenSizeX
         self.currNote = -1
         self.lastAspectRatio = 0
         self.state = self.STATE_SILENT
@@ -55,8 +55,8 @@ class Synth:
     def calcNote(self, avgY, left_hand_open, right_hand_open):
         section = (1.0 * (self.height - avgY)) / self.height
         print self.height, avgY
-        print "sec: ", section
         section = int ( math.floor(section * self.NUM_NOTES) )
+        print "sec: ", section
         
         print "current state: ", self.state
         
