@@ -58,14 +58,7 @@ def addKeyboard(img):
 #while(False):
 while(True):
     ret, frameorig = cap.read() #read a frame
-    grayframe = cv2.cvtColor(frameorig, cv2.COLOR_BGR2GRAY)
     frameorig = cv2.flip(frameorig, 1)
-    edge = cv2.Canny(grayframe, 100, 200)
-
-    mask = fgbg.apply(frameorig)
-    mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
-
-    frame1 = cv2.bitwise_and(frameorig, mask)
 
     if os.path.isfile("hand_hist.npy") and not trained_hand:
         hand_hist = np.load("hand_hist.npy")
@@ -80,29 +73,7 @@ while(True):
 
         frame2 = hist_utils.draw_rects(frameorig, horizontal=False)
         cv2.imshow("frame", frame2)
-
-    #elif not trained_dollar:
-    #   start_timer += 1
-    #   if cv2.waitKey(1) & 0xFF == ord('p'):# or start_timer == 100:
-    #        dollar_hist = hist_utils.get_hist(frameorig)
-    #        trained_dollar = True
-
-    #    frame2 = hist_utils.draw_rects(frameorig)
-    #    cv2.imshow("frame", frame2)
     else:
-        if len(frames) < maxFrames:
-            frames.append(frame1)
-        else:
-            frames[frameCount % maxFrames] = frame1
-        frameCount += 1
-
-        summedFrame = np.zeros((len(frame1),len(frame1[0]),3))
-        for f in frames:
-            cv2.accumulate(f, summedFrame)
-
-        summedFrame /= len(frames)
-        summedFrame = summedFrame.astype("uint8")
-
         ### PUT THRESHOLD HERE
         gray = cv2.cvtColor(frameorig, cv2.COLOR_BGR2GRAY)
 	
@@ -137,7 +108,7 @@ while(True):
             dist_left = 0
             if len(left) != 0:
                 for i in range(len(left)):
-                    summedFrame[i, mean[0], 0] = 255
+                    frameorig[i, mean[0], 0] = 255
                 farthest_point_left = hist_utils.get_color_point(left, hand_hist)
                   
             right = frameorig[:,mean[0]:]
@@ -165,12 +136,8 @@ while(True):
                            
         addKeyboard(frameorig)
         cv2.imshow("frame", frameorig)
-        #cv2.imshow("mask", mask)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-
-#cv2.imshow('7dollar.png', dollar_image)
-#md.detect(dollar_image)
 
 syn.cleanup()
 
