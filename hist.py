@@ -25,7 +25,7 @@ fgbg = cv2.BackgroundSubtractorMOG()
 trained_hand = False
 trained_dollar = False
 
-pointing_threshold = 300
+pointing_threshold = 200
 
 hand_hist = None
 dollar_hist = None
@@ -171,8 +171,11 @@ while(True):
                     
 
                 
-                syn.modSynth(hull, dist_left < pointing_threshold, dist_right < pointing_threshold)
-            
+                           # syn.modSynth(hull, dist_left < pointing_threshold, dist_right < pointing_threshold)
+                left_held = True if farthest_point_left is None else farthest_point_left[1] < mean[1] + pointing_threshold
+                right_held = True if farthest_point_right is None else farthest_point_right[1] < mean[1] + pointing_threshold
+                syn.modSynth(hull, left_held, right_held)
+                           
         addKeyboard(summedFrame)
         cv2.imshow("frame", summedFrame)
 
