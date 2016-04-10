@@ -32,10 +32,18 @@ syn = Synth(len(frame1), len(frame1[0]))
 
 start_timer = 0
 cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
+cv2.namedWindow('edge', cv2.WINDOW_NORMAL)
 
 #while(False):
 while(True):
     ret, frame1 = cap.read() #read a frame
+
+    frameorig = np.copy(frame1)
+    
+    grayframe = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
+    edge = cv2.Canny(grayframe, 100, 200)
+    
+    
     mask = fgbg.apply(frame1)
     mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
     frame1 = cv2.bitwise_and(frame1, mask)
@@ -44,16 +52,22 @@ while(True):
     
     if not trained_dollar:
         start_timer += 1
-        if cv2.waitKey(1) & 0xFF == ord('p') or start_timer == 100:
+        if cv2.waitKey(1) & 0xFF == ord('p'):# or start_timer == 100:
             dollar_hist = hist_utils.get_hist(frame1)
             trained_dollar = True
             
-        frame1 = hist_utils.draw_rects(frame1)
-        cv2.imshow("frame", frame1)
+        frame2 = hist_utils.draw_rects(frame1)
+        cv2.imshow("frame", frame2)
     else:
-        frame1 = camera.diff_frames_blurred(frame1)
-        frame1 = hist_utils.hist_filter(frame1, dollar_hist)
+        hist = hist_utils.hist_filter(frameorig, dollar_hist)
+        grayhist = cv2.cvtColor(hist, cv2.COLOR_BGR2GRAY)
 
+        combined = cv2.bitwise_and(edge, grayhist)
+        cv2.imshow("edge", edge)
+
+        diffframe1 = camera.diff_frames_blurred(frame1)
+        frame1 = hist_utils.hist_filter(diffframe1, dollar_hist)
+        
         # calculate average frame over maxFrames
         
         if len(frames) < maxFrames:
@@ -77,6 +91,7 @@ while(True):
         #_,contours,hierarchy = cv2.findContours(framet, 1, 2)
         contours, hierarchy = cv2.findContours(framet, 1, 2)
 
+        
         framet = cv2.cvtColor(framet, cv2.COLOR_GRAY2RGB)
         allpts = []
         if len(contours) > 0:
