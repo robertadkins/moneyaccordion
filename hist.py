@@ -40,7 +40,7 @@ def addKeyboard(img):
     xlen = len(img[0])
     ylen = len(img)
 
-    note = syn.currNote - 1
+    note = 4 - syn.currNote - 1
 
     cv2.rectangle(img,(0,0),(xlen,ylen),(0,255,0),3)
 
