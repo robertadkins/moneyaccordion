@@ -22,7 +22,7 @@ class SynthControl:
         else:
             scale = self.SCALES[1]
         self.scale = map(lambda x: x + base, scale)
-        self.note = -1
+        self.notes = []
 
         # launch helm
         self.helm = Popen("exec /Applications/Helm.app/Contents/MacOS/Helm", shell=True)
@@ -49,15 +49,26 @@ class SynthControl:
     
     def play_note(self, num, velocity):
         """ num is an index for the scale, velocity is a float between 0 and 1 """
-        if self.note != -1:
-            self.note_off()
-            
-        self.note = self.scale[num % len(self.scale)]
+        if self.notes != []:
+            self.stop_sound()
+
+        self.notes.append(self.scale[num % len(self.scale)])
         self.midiout.send_message([0x90, self.note, int(velocity * 127)])
 
-    def note_off(self):
-        self.midiout.send_message([0x80, self.note, 0])
-        self.note = -1
+    def play_chord(self, num, velocity):
+        # do major root chord
+        if self.notes != []:
+            self.stop_sound()
+
+        for i in [0, 2, 4]:
+            note = self.scale[(num + i) % len(self.scale)]
+            self.notes.append(note)
+            self.midiout.send_message([0x90, note, int(velocity * 127)])
+
+    def stop_sound(self):
+        for note in self.notes:
+            self.midiout.send_message([0x80, note, 0])
+            self.note = []
 
     def adjust_cutoff(self, val):
         """ val is between 0 and 1 """

@@ -40,7 +40,7 @@ class Synth:
         ar = (maxY - minY) / (maxX - minX)
         print "vol",math.atan(ar - self.lastAspectRatio) / math.pi / 2 + 1
         self.synth.adjust_vol(math.atan(ar - self.lastAspectRatio) / math.pi / 2 + 1)
-        self.synth.adjust_cutoff(avgX / self.width * 0.25 + 0.75)
+        self.synth.adjust_cutoff(avgX / self.width * 0.2 + 0.8)
         self.lastAspectRatio = ar
         #self.calcNote(minY)
         self.calcNote(avgY)
@@ -50,14 +50,14 @@ class Synth:
         section = 1.0 * (self.height - minY) / (self.height)
         print self.height, minY
         print "sec: ", section
-        section = int ( 2 * math.floor(section * 4) )
+        section = int ( math.floor(section * 4) )
         
         print "current section: ", section 
         
         if self.currNote != section:
             if(self.currNote != -1):
-                self.synth.note_off()
-            self.synth.play_note(section, 1)
+                self.synth.stop_sound()
+            self.synth.play_chord(section, 1)
             self.currNote = section
     
     
