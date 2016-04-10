@@ -59,6 +59,23 @@ def hist_filter(frame, hist):
 
     return cv2.bitwise_and(frame, thresh)
 
+def get_color_point(frame, hist):
+    isolated_frame = hist_filter(frame, hist)
+    
+    gray = cv2.cvtColor(isolated_frame, cv2.COLOR_BGR2GRAY)
+    ret, thresh = cv2.threshold(gray, 100, 255, 0)
+    
+    M = cv2.moments(thresh)
+
+    dM01 = M['m01']
+    dM10 = M['m10']
+    dArea = M['m00']
+    if (dArea < 10000):
+        print "Object not found."
+        return None
+    else:
+        return (dM10 / dArea, dM01 / dArea)
+
 def find_hand_farthest_point(frame, hist):
     hand_isolated_frame = hist_filter(frame, hist)
     
