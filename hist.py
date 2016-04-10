@@ -23,8 +23,10 @@ fgbg = cv2.BackgroundSubtractorMOG()
 
 #dollar_image = cv2.imread('7dollar.png', cv2.IMREAD_UNCHANGED)
 
+trained_hand = False
 trained_dollar = False
 
+hand_hist = None
 dollar_hist = None
 
 ret, frame1 = cap.read()
@@ -35,16 +37,26 @@ cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
 
 #while(False):
 while(True):
-    ret, frame1 = cap.read() #read a frame
+    ret, orig_frame1 = cap.read() #read a frame
+    orig_frame1 = cv2.flip(orig_frame1, 1)
+    
     mask = fgbg.apply(frame1)
     mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
-    frame1 = cv2.bitwise_and(frame1, mask)
     
-    frame1 = cv2.flip(frame1, 1)
+    frame1 = cv2.bitwise_and(orig_frame1, mask)
     
+    
+    if not trained_hand:
+        if cv2.waitKey(1) & 0xFF == ord('p'):
+            hand_hist = hist_utils.get_hist(frame1)
+            trained_hand = True
+            
+        frame1 = hist_utils.draw_rects(frame1, horizontal=false)
+        cv2.imshow("frame", frame1)
+        
     if not trained_dollar:
         start_timer += 1
-        if cv2.waitKey(1) & 0xFF == ord('p') or start_timer == 100:
+        if cv2.waitKey(1) & 0xFF == ord('p'):# or start_timer == 100:
             dollar_hist = hist_utils.get_hist(frame1)
             trained_dollar = True
             
@@ -114,6 +126,9 @@ while(True):
         
                   #framet = cv2.cvtColor(framet, cv2.COLOR_GRAY2RGB)
                   #framet[1] = framet1
+        farthest_point = hist_utils.find_hand_farthest_point(orig_frame1, hand_hist)
+        if farthest_point is not None:
+            cv2.circle(summedFrame, farthest_point, 5, [0,0,255], -1)
         cv2.imshow("frame", summedFrame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
