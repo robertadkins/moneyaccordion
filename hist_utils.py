@@ -9,9 +9,14 @@ def draw_rects(frame):
     
     rows,cols,_ = frame.shape
 
-    hand_row_nw = np.array([6*rows/20,6*rows/20,6*rows/20,10*rows/20,10*rows/20,10*rows/20,14*rows/20,14*rows/20,14*rows/20])
+    
+    hand_row_nw = np.array([9*rows/20,10*rows/20,11*rows/20,9*rows/20,10*rows/20,11*rows/20,9*rows/20,10*rows/20,11*rows/20])
 
-    hand_col_nw = np.array([9*cols/20,10*cols/20,11*cols/20,9*cols/20,10*cols/20,11*cols/20,9*cols/20,10*cols/20,11*cols/20])
+    hand_col_nw = np.array([6*cols/20,6*cols/20,6*cols/20,10*cols/20,10*cols/20,10*cols/20,14*cols/20,14*cols/20,14*cols/20])
+    
+    #hand_row_nw = np.array([6*rows/20,6*rows/20,6*rows/20,10*rows/20,10*rows/20,10*rows/20,14*rows/20,14*rows/20,14*rows/20])
+
+    #hand_col_nw = np.array([9*cols/20,10*cols/20,11*cols/20,9*cols/20,10*cols/20,11*cols/20,9*cols/20,10*cols/20,11*cols/20])
 
     hand_row_se = hand_row_nw + 10
     hand_col_se = hand_col_nw + 10
