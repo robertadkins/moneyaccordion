@@ -110,13 +110,13 @@ def find_hand_farthest_point(frame, hist):
             if dist_max_i < len(s):
                 farthest_defect = s[dist_max_i]
                 farthest_point = tuple(largest_contour[farthest_defect][0])
-
+                
                 for cnt in contours:
                     if cnt is not largest_contour:
                         cv2.drawContours(hand_isolated_frame, cnt, -1, (255,0,0), 3)
                     else:
                         cv2.drawContours(hand_isolated_frame, cnt, -1, (0,255,0), 3)
                 
-                return farthest_point, hand_isolated_frame
+                return dist[dist_max_i], farthest_point, hand_isolated_frame
             
     return None, None

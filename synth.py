@@ -4,13 +4,18 @@ import math
 
 class Synth:
     def __init__(self, screenSizeX, screenSizeY):
+        self.STATE_SILENT = 0
+        self.STATE_NOTE = 1
+        self.STATE_CHORD = 2
+        
         self.synth = sc.SynthControl()
         self.width = screenSizeX
         self.height = screenSizeY
         self.currNote = -1
         self.lastAspectRatio = 0
+        self.state = self.STATE_SILENT
     
-    def modSynth(self, hull):
+    def modSynth(self, hull, left_hand_open, right_hand_open):
         maxY = 0
         maxX = 0
         minY = 50000
@@ -46,18 +51,27 @@ class Synth:
         self.calcNote(avgY)
         
         
-    def calcNote(self, minY):
+    def calcNote(self, minY, left_hand_open, right_hand_open):
         section = 1.0 * (self.height - minY) / (self.height)
         print self.height, minY
         print "sec: ", section
         section = int ( math.floor(section * 4) )
         
-        print "current section: ", section 
+        print "current section: ", section
         
-        if self.currNote != section:
-            if(self.currNote != -1):
+        new_state = self.STATE_SILENT
+        if not left_hand_open and not right_hand_open:
+            new_state = self.STATE_CHORD
+        elif not (left_hand_open and right_hand_open):
+            new_state = self.STATE_NOTE
+        
+        if self.currNote != section or self.state != new_state:
+            if(self.currNote != -1 or new_state = self.STATE_SILENT):
                 self.synth.stop_sound()
-            self.synth.play_chord(section, 1)
+            if new_state = self.STATE_CHORD:
+                self.synth.play_chord(section, 1)
+            if new_state = self.STATE_NOTE:
+                self.synth.play_note(section, 1)
             self.currNote = section
     
     

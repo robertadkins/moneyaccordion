@@ -1,4 +1,3 @@
-import numpy as npA
 import cv2
 import moneydetector as md
 import time
@@ -25,6 +24,8 @@ fgbg = cv2.BackgroundSubtractorMOG()
 
 trained_hand = False
 trained_dollar = False
+
+pointing_threshold = 300
 
 hand_hist = None
 dollar_hist = None
@@ -131,15 +132,23 @@ while(True):
             if len(allpts) > 0:
                 hull = cv2.convexHull(np.array(allpts))
                 cv2.drawContours(summedFrame, [hull], -1, (0,255,0), 3)
-                syn.modSynth(hull)
+                
+                
+                M = cv2.moments(hull)
+                cx = int(M['m10']/M['m00'])
+                cy = int(M['m01']/M['m00'])
+                
+                dist_left, farthest_point_left, hand_isolated_frame_left = hist_utils.find_hand_farthest_point(frameorig[0:cx,:], hand_hist)
+                if farthest_point_left is not None:
+                    cv2.circle(summedFrame, farthest_point_left, 5, [0,0,255], -1)
+                dist_right, farthest_point_right, hand_isolated_frame_right = hist_utils.find_hand_farthest_point(frameorig[cx:,:], hand_hist)
+                if farthest_point_right is not None:
+                    cv2.circle(summedFrame, farthest_point_right, 5, [0,255,255], -1)
+                    
+                cv2.imshow("frame", summedFrame)
+                
+                syn.modSynth(hull, dist_left < point_threshold, dist_right < point_threshold)
             
-        
-                  #framet = cv2.cvtColor(framet, cv2.COLOR_GRAY2RGB)
-                  #framet[1] = framet1
-        farthest_point, hand_isolated_frame = hist_utils.find_hand_farthest_point(frameorig, hand_hist)
-        if farthest_point is not None:
-            cv2.circle(hand_isolated_frame, farthest_point, 5, [0,0,255], -1)
-        cv2.imshow("frame", hand_isolated_frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
