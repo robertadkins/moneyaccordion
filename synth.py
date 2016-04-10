@@ -57,7 +57,7 @@ class Synth:
         print "sec: ", section
         section = int ( math.floor(section * 4) )
         
-        print "current section: ", section
+        print "current state: ", self.state
         
         new_state = self.STATE_SILENT
         if not left_hand_open and not right_hand_open:
@@ -70,7 +70,9 @@ class Synth:
                 self.synth.stop_sound()
             if new_state == self.STATE_CHORD:
                 self.synth.play_chord(section, 1)
+                print "playing chord"
             if new_state == self.STATE_NOTE:
+                print "playing note"
                 self.synth.play_note(section, 1)
             self.currNote = section
     

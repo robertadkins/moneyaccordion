@@ -25,7 +25,7 @@ fgbg = cv2.BackgroundSubtractorMOG()
 trained_hand = False
 trained_dollar = False
 
-pointing_threshold = 200
+pointing_threshold = 0
 
 hand_hist = None
 dollar_hist = None
@@ -65,7 +65,7 @@ while(True):
     mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
 
     frame1 = cv2.bitwise_and(frameorig, mask)
-    frame1 = frameorig
+#    frame1 = frameorig
 
     if not trained_hand:
         if cv2.waitKey(1) & 0xFF == ord('p'):
@@ -159,25 +159,38 @@ while(True):
                 if len(left) != 0:
                     for i in range(len(left)):
                         summedFrame[i, mean[0], 0] = 255
-                    dist_left, farthest_point_left, hand_isolated_frame_left = hist_utils.find_hand_farthest_point(left, hand_hist, mean)
-                    if farthest_point_left is not None:
-                        cv2.circle(summedFrame, farthest_point_left, 5, [0,0,255], -1)
+                    #dist_left, farthest_point_left, hand_isolated_frame_left = hist_utils.find_hand_farthest_point(left, hand_hist, mean)
+                    farthest_point_left = hist_utils.get_color_point(left, hand_hist)
+                  
+                       
                 right = frameorig[:,mean[0]:]
                 dist_right = 0
                 if len(right) != 0:
-                       dist_right, farthest_point_right, hand_isolated_frame_right = hist_utils.find_hand_farthest_point(right, hand_hist, mean)
-                       if farthest_point_right is not None:
-                           cv2.circle(summedFrame, farthest_point_right, 5, [0,255,255], -1)
-                    
+                    # dist_right, farthest_point_right, hand_isolated_frame_right = hist_utils.find_hand_farthest_point(right, hand_hist, mean)
+                    farthest_point_right = hist_utils.get_color_point(right, hand_hist)
+
+                cv2.circle(frameorig, (mean[0], mean[1]), 5, [255,0,255], -1)
 
                 
                            # syn.modSynth(hull, dist_left < pointing_threshold, dist_right < pointing_threshold)
-                left_held = True if farthest_point_left is None else farthest_point_left[1] < mean[1] + pointing_threshold
-                right_held = True if farthest_point_right is None else farthest_point_right[1] < mean[1] + pointing_threshold
-                syn.modSynth(hull, left_held, right_held)
+                left_open = True if farthest_point_left is None else farthest_point_left[1] < mean[1] + pointing_threshold
+                right_open = True if farthest_point_right is None else farthest_point_right[1] < mean[1] + pointing_threshold
+
+                if farthest_point_right is not None:
+                    farthest_point_right = (farthest_point_right[0] + mean[0], farthest_point_right[1])
+                    cl = [0,255,0] if not right_open else [0,255,255]
+                    cv2.circle(frameorig, (int(farthest_point_right[0]),int(farthest_point_right[1])), 5, cl, -1)
+                if farthest_point_left is not None:
+                    cl = [0,255,0] if not left_open else [0,0,255]
+                    cv2.circle(frameorig, (int(farthest_point_left[0]),int(farthest_point_left[1])), 5, cl, -1)
+                    print "left open: ",left_open
+                    print "left: ", farthest_point_left[1]
+                    print "mean: ", mean[1]
+                    print "th: ", mean[1] - pointing_threshold
+                syn.modSynth(hull, left_open, right_open)
                            
-        addKeyboard(summedFrame)
-        cv2.imshow("frame", summedFrame)
+        addKeyboard(frameorig)
+        cv2.imshow("frame", frameorig)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
