@@ -4,12 +4,12 @@ import numpy as np
 
 hand_row_nw, hand_col_nw, hand_row_se, hand_col_se = [], [], [], []
 
-def draw_rects(frame, horizontal = True): 
+def draw_rects(frame, horizontal = True):
     global hand_row_nw, hand_col_nw, hand_row_se, hand_col_se
-    
+
     rows,cols,_ = frame.shape
 
-    
+
     if horizontal:
         hand_row_nw = np.array([9*rows/20,10*rows/20,11*rows/20,9*rows/20,10*rows/20,11*rows/20,9*rows/20,10*rows/20,11*rows/20])
 
@@ -31,7 +31,7 @@ def draw_rects(frame, horizontal = True):
 
 def get_hist(frame):
     global hand_row_nw, hand_col_nw, hand_row_se, hand_col_se
-    
+
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     roi = np.zeros([90,10,3], dtype=hsv.dtype)
 
@@ -41,7 +41,7 @@ def get_hist(frame):
 
     hand_hist = cv2.calcHist([roi],[0, 1], None, [180, 256], [0, 180, 0, 256])
     cv2.normalize(hand_hist, hand_hist, 0, 255, cv2.NORM_MINMAX)
-    
+
     return hand_hist
 
 def hist_filter(frame, hist):
@@ -65,11 +65,11 @@ def find_hand_farthest_point(frame, hist, bill_center):
     
     hand_isolated_frame = hist_filter(frame, hist)
 
-    
     gray = cv2.cvtColor(hand_isolated_frame, cv2.COLOR_BGR2GRAY)
     ret, thresh = cv2.threshold(gray, 0, 255, 0)
+    #_,contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
+
     if contours is not None and len(contours) > 0:
         max_i = 0
         max_area = 0
@@ -82,23 +82,23 @@ def find_hand_farthest_point(frame, hist, bill_center):
                 max_i = i
 
         largest_contour = contours[max_i]
-        
-        
+
+
         hull = cv2.convexHull(largest_contour)
-        
+
         moments = cv2.moments(largest_contour)
         centroid = None
         if moments['m00'] != 0:
             cx = int(moments['m10']/moments['m00'])
             cy = int(moments['m01']/moments['m00'])
             centroid = (cx,cy)
-        
+
         defects = None
         non_returnpoints_hull = cv2.convexHull(largest_contour, returnPoints=False)
         if non_returnpoints_hull is not None and len(non_returnpoints_hull) > 3 and len(largest_contour) > 3:
             defects = cv2.convexityDefects(largest_contour, non_returnpoints_hull)
 
-        if centroid is not None and defects is not None and len(defects) > 0:   
+        if centroid is not None and defects is not None and len(defects) > 0:
             s = defects[:,0][:,0]
             cx, cy = centroid
 
