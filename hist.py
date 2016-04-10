@@ -53,6 +53,8 @@ while(True):
     else:
         frame1 = camera.diff_frames_blurred(frame1)
         frame1 = hist_utils.hist_filter(frame1, dollar_hist)
+
+        # calculate average frame over maxFrames
         
         if len(frames) < maxFrames:
             frames.append(frame1)
@@ -73,7 +75,7 @@ while(True):
         framet = cv2.morphologyEx(framet, cv2.MORPH_CLOSE, np.ones((2,2),np.uint8), iterations=10)
         #framet1 = np.copy(framet)
         #_,contours,hierarchy = cv2.findContours(framet, 1, 2)
-        contours,hierarchy = cv2.findContours(framet, 1, 2)
+        contours, hierarchy = cv2.findContours(framet, 1, 2)
 
         framet = cv2.cvtColor(framet, cv2.COLOR_GRAY2RGB)
         allpts = []

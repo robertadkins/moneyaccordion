@@ -17,11 +17,13 @@ class Synth:
         minX = 50000
         
         avgY = 0
+        avgX = 0
         count = 0
         
         for pt in hull:
             x, y = pt[0][0], pt[0][1]
             avgY += y
+            avgX += x
             count += 1
             if x > maxX:
                 maxX = x
@@ -33,20 +35,22 @@ class Synth:
                 minY = y
         
         avgY = avgY / count
+        avgX = avgX / count
         
         ar = (maxY - minY) / (maxX - minX)
         print "vol",math.atan(ar - self.lastAspectRatio) / math.pi / 2 + 1
         self.synth.adjust_vol(math.atan(ar - self.lastAspectRatio) / math.pi / 2 + 1)
+        self.synth.adjust_cutoff(avgX / self.width * 0.25 + 0.75)
         self.lastAspectRatio = ar
         #self.calcNote(minY)
         self.calcNote(avgY)
         
         
     def calcNote(self, minY):
-        section = 1.0 * (self.height - minY) / (self.height / 3)
+        section = 1.0 * (self.height - minY) / (self.height)
         print self.height, minY
         print "sec: ", section
-        section = int ( math.floor(section * 8) )
+        section = int ( 2 * math.floor(section * 4) )
         
         print "current section: ", section 
         
