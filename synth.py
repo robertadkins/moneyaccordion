@@ -7,6 +7,8 @@ class Synth:
         self.STATE_SILENT = 0
         self.STATE_NOTE = 1
         self.STATE_CHORD = 2
+
+        self.NUM_NOTES = 3
         
         self.synth = sc.SynthControl()
         self.width = screenSizeX
@@ -43,19 +45,18 @@ class Synth:
         avgX = avgX / count
         
         ar = (maxY - minY) / (maxX - minX)
-        print "vol",math.atan(ar - self.lastAspectRatio) / math.pi / 2 + 1
-        self.synth.adjust_vol(math.atan(ar - self.lastAspectRatio) / math.pi / 2 + 1)
+        print "vol", (math.atan(ar - self.lastAspectRatio) / math.pi + 1) / 2
+        self.synth.adjust_vol((math.atan(10 * (ar - self.lastAspectRatio)) / math.pi + 1)/ 2)
         self.synth.adjust_cutoff(avgX / self.width * 0.2 + 0.8)
         self.lastAspectRatio = ar
-        #self.calcNote(minY)
         self.calcNote(avgY, left_hand_open, right_hand_open)
         
         
-    def calcNote(self, minY, left_hand_open, right_hand_open):
-        section = 1.0 * (self.height - minY) / (self.height)
-        print self.height, minY
+    def calcNote(self, avgY, left_hand_open, right_hand_open):
+        section = (1.0 * (self.height - avgY)) / self.height
+        print self.height, avgY
         print "sec: ", section
-        section = int ( math.floor(section * 4) )
+        section = int ( math.floor(section * self.NUM_NOTES) )
         
         print "current state: ", self.state
         
@@ -66,7 +67,7 @@ class Synth:
             new_state = self.STATE_NOTE
         
         if self.currNote != section or self.state != new_state:
-            if(self.currNote != -1 or new_state == self.STATE_SILENT):
+            if(new_state == self.STATE_SILENT):
                 self.synth.stop_sound()
             if new_state == self.STATE_CHORD:
                 self.synth.play_chord(section, 1)
@@ -75,6 +76,7 @@ class Synth:
                 print "playing note"
                 self.synth.play_note(section, 1)
             self.currNote = section
+            self.state = new_state
     
     
     def cleanup(self):

@@ -25,7 +25,7 @@ fgbg = cv2.BackgroundSubtractorMOG()
 trained_hand = False
 trained_dollar = False
 
-pointing_threshold = 0
+pointing_threshold = 20
 
 hand_hist = None
 dollar_hist = None
@@ -35,7 +35,7 @@ syn = Synth(len(frame1), len(frame1[0]))
 
 start_timer = 0
 cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
-cv2.namedWindow('edge', cv2.WINDOW_NORMAL)
+#cv2.namedWindow('mask', cv2.WINDOW_NORMAL)
 
 def addKeyboard(img):
     xlen = len(img[0])
@@ -98,12 +98,12 @@ while(True):
         summedFrame = summedFrame.astype("uint8")
 
         ### PUT THRESHOLD HERE
-        gray = cv2.cvtColor(summedFrame, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(frameorig, cv2.COLOR_BGR2GRAY)
 	
-	greenLower = (30, 10, 0)
-	greenUpper = (140, 200, 255)
+	greenLower = (20, 10, 20)
+	greenUpper = (65, 255, 255) # 35, 19, 58
 	
-	hsv = cv2.cvtColor(summedFrame, cv2.COLOR_BGR2HSV)
+	hsv = cv2.cvtColor(frameorig, cv2.COLOR_BGR2HSV)
 	mask = cv2.inRange(hsv, greenLower, greenUpper)
 	
 	mask = cv2.erode(mask, None, iterations=2)
@@ -141,8 +141,8 @@ while(True):
 
             cv2.circle(frameorig, (mean[0], mean[1]), 5, [255,0,255], -1)
             
-            left_open = True if farthest_point_left is None else farthest_point_left[1] < mean[1] + pointing_threshold
-            right_open = True if farthest_point_right is None else farthest_point_right[1] < mean[1] + pointing_threshold
+            left_open = True if farthest_point_left is None else farthest_point_left[1] < mean[1] - pointing_threshold
+            right_open = True if farthest_point_right is None else farthest_point_right[1] < mean[1] - pointing_threshold
 
             if farthest_point_right is not None:
                 farthest_point_right = (farthest_point_right[0] + mean[0], farthest_point_right[1])
@@ -159,7 +159,7 @@ while(True):
                            
         addKeyboard(frameorig)
         cv2.imshow("frame", frameorig)
-
+        #cv2.imshow("mask", mask)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
