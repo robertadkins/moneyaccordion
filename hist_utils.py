@@ -45,6 +45,7 @@ def get_hist(frame):
     return hand_hist
 
 def hist_filter(frame, hist):
+    print "shape:", frame.shape
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     dst = cv2.calcBackProject([hsv], [0,1], hist, [0,180,0,256], 1)
     disc = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11,11))
@@ -119,4 +120,4 @@ def find_hand_farthest_point(frame, hist):
                 
                 return dist[dist_max_i], farthest_point, hand_isolated_frame
             
-    return None, None
+    return None, None, None

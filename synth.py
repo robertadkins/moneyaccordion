@@ -48,7 +48,7 @@ class Synth:
         self.synth.adjust_cutoff(avgX / self.width * 0.2 + 0.8)
         self.lastAspectRatio = ar
         #self.calcNote(minY)
-        self.calcNote(avgY)
+        self.calcNote(avgY, left_hand_open, right_hand_open)
         
         
     def calcNote(self, minY, left_hand_open, right_hand_open):
@@ -66,11 +66,11 @@ class Synth:
             new_state = self.STATE_NOTE
         
         if self.currNote != section or self.state != new_state:
-            if(self.currNote != -1 or new_state = self.STATE_SILENT):
+            if(self.currNote != -1 or new_state == self.STATE_SILENT):
                 self.synth.stop_sound()
-            if new_state = self.STATE_CHORD:
+            if new_state == self.STATE_CHORD:
                 self.synth.play_chord(section, 1)
-            if new_state = self.STATE_NOTE:
+            if new_state == self.STATE_NOTE:
                 self.synth.play_note(section, 1)
             self.currNote = section
     

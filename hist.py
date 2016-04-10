@@ -134,20 +134,26 @@ while(True):
                 cv2.drawContours(summedFrame, [hull], -1, (0,255,0), 3)
                 
                 
-                M = cv2.moments(hull)
-                cx = int(M['m10']/M['m00'])
-                cy = int(M['m01']/M['m00'])
-                
-                dist_left, farthest_point_left, hand_isolated_frame_left = hist_utils.find_hand_farthest_point(frameorig[0:cx,:], hand_hist)
-                if farthest_point_left is not None:
-                    cv2.circle(summedFrame, farthest_point_left, 5, [0,0,255], -1)
-                dist_right, farthest_point_right, hand_isolated_frame_right = hist_utils.find_hand_farthest_point(frameorig[cx:,:], hand_hist)
-                if farthest_point_right is not None:
-                    cv2.circle(summedFrame, farthest_point_right, 5, [0,255,255], -1)
+                #M = cv2.moments(hull)
+                #cx = int(M['m10']/M['m00'])
+                #cy = int(M['m01']/M['m00'])
+
+                left = frameorig[0:mean[0],:]
+                dist_left = 0
+                if len(left) != 0:
+                    dist_left, farthest_point_left, hand_isolated_frame_left = hist_utils.find_hand_farthest_point(left, hand_hist)
+                    if farthest_point_left is not None:
+                        cv2.circle(summedFrame, farthest_point_left, 5, [0,0,255], -1)
+                right = frameorig[mean[0]:,:]
+                dist_right = 0
+                if len(right) != 0:
+                       dist_right, farthest_point_right, hand_isolated_frame_right = hist_utils.find_hand_farthest_point(right, hand_hist)
+                       if farthest_point_right is not None:
+                           cv2.circle(summedFrame, farthest_point_right, 5, [0,255,255], -1)
                     
                 cv2.imshow("frame", summedFrame)
                 
-                syn.modSynth(hull, dist_left < point_threshold, dist_right < point_threshold)
+                syn.modSynth(hull, dist_left < pointing_threshold, dist_right < pointing_threshold)
             
 
     if cv2.waitKey(1) & 0xFF == ord('q'):

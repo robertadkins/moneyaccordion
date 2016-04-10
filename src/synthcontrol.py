@@ -51,9 +51,9 @@ class SynthControl:
         """ num is an index for the scale, velocity is a float between 0 and 1 """
         if self.notes != []:
             self.stop_sound()
-
-        self.notes.append(self.scale[num % len(self.scale)])
-        self.midiout.send_message([0x90, self.note, int(velocity * 127)])
+        note = self.scale[num % len(self.scale)]
+        self.notes.append(note)
+        self.midiout.send_message([0x90, note, int(velocity * 127)])
 
     def play_chord(self, num, velocity):
         # do major root chord
