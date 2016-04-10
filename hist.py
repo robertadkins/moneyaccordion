@@ -51,8 +51,9 @@ def addKeyboard(img):
 
     for i in range(syn.NUM_NOTES + 1):
         cv2.rectangle(img,(0, noteboxy * i), (xlen, noteboxy*(i+1)), (0,255,0), 2)
-
-    cv2.rectangle(img,(xlen-50, noteboxy*note+20), (xlen-10, noteboxy*(note+1)-20), (0,255,0), -1)
+        
+    cv2.rectangle(img,(0, noteboxy * note), (xlen, noteboxy*(note+1)), (0,0,255), 6)
+    cv2.rectangle(img,(xlen-50, noteboxy*note+20), (xlen-10, noteboxy*(note+1)-20), (0,0,255), -1)
 
 
 while(True):
@@ -100,7 +101,7 @@ while(True):
             hull = cv2.convexHull(maxcnt)
             
             if frame_num % frame_len == 0:
-                cv2.drawContours(frameorig, [hull], 0, (0,0,255), 3)
+                cv2.drawContours(frameorig, [hull], 0, (150,50,0), 3)
 
             M = cv2.moments(maxcnt)
             mean = [0,0]

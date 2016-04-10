@@ -8,8 +8,8 @@ import time
 
 class SynthControl:
     """ interfaces via MIDI to a synthesizer """
-    SCALES = [[0, 2, 4, 5, 7, 9, 11, 12],\
-              [0, 2, 3, 5, 7, 8, 10, 12]] # major / minor
+    SCALES = [[0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24],\
+              [0, 2, 3, 5, 7, 8, 10, 12, 14, 15, 17, 19, 20, 22, 24]] # major / minor
     #helm
     #scale
     #cutoff
@@ -51,13 +51,13 @@ class SynthControl:
         """ num is an index for the scale, velocity is a float between 0 and 1 """
         if self.notes != []:
             self.stop_sound()
-        #note = self.scale[num % len(self.scale)]
-        #self.notes.append(note)
-        #self.midiout.send_message([0x90, note, int(velocity * 127)])
-        for i in [0, 3, 5]:
-            note = self.scale[(num + i) % len(self.scale)]
-            self.notes.append(note)
-            self.midiout.send_message([0x90, note, int(velocity * 127)])
+        note = self.scale[num % len(self.scale)]
+        self.notes.append(note)
+        self.midiout.send_message([0x90, note, int(velocity * 127)])
+        #for i in [0, 3, 5]:
+        #    note = self.scale[(num + i) % len(self.scale)]
+        #    self.notes.append(note)
+        #    self.midiout.send_message([0x90, note, int(velocity * 127)])
 
 
     def play_chord(self, num, velocity):

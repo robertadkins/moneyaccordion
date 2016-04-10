@@ -45,8 +45,8 @@ class Synth:
         avgX = avgX / count
         
         ar = (maxY - minY) / (maxX - minX)
-        print "vol", (math.atan(ar - self.lastAspectRatio) / math.pi + 1) / 2
-        self.synth.adjust_vol((math.atan(10 * (ar - self.lastAspectRatio)) / math.pi + 1)/ 2)
+        print "vol", abs(math.atan(ar - self.lastAspectRatio) / (math.pi / 2.0))
+        self.synth.adjust_vol(abs(math.atan(ar - self.lastAspectRatio) / (math.pi / 2.0)))
         self.synth.adjust_cutoff(avgX / self.width * 0.2 + 0.8)
         self.lastAspectRatio = ar
         self.calcNote(avgY, left_hand_open, right_hand_open)
