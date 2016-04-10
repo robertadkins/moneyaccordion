@@ -35,15 +35,17 @@ def diff_frames_blurred(frame):
 
     diff = cv2.subtract(frame, prev_frame)
 
+    cv2.GaussianBlur(diff, (7,7), 0, diff)
+
     #for later
     diff_mod = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
-    disc = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (4,4))
-    cv2.filter2D(diff_mod, -1, disc, diff_mod)
+    """disc = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (4,4))
+    cv2.filter2D(diff_mod, -1, disc, diff_mod)"""
 
-    ret, thresh = cv2.threshold(diff_mod, 100, 255, 0)
+    thresh = cv2.adaptiveThreshold(diff_mod, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 5, 10) #cv2.threshold(diff_mod, 100, 255, 0)
     thresh = cv2.merge((thresh,thresh, thresh))
     diff_mod = cv2.cvtColor(diff_mod, cv2.COLOR_GRAY2RGB)
-
+    
     res = cv2.bitwise_and(frame, diff_mod)
     
     prev_frame = frame
