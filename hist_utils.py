@@ -60,8 +60,11 @@ def hist_filter(frame, hist):
 
     return cv2.bitwise_and(frame, thresh)
 
-def find_hand_farthest_point(frame, hist):
+def find_hand_farthest_point(frame, hist, bill_center):
+    MAX_DISTANCE_FROM_CENTER = 200
+    
     hand_isolated_frame = hist_filter(frame, hist)
+
     
     gray = cv2.cvtColor(hand_isolated_frame, cv2.COLOR_BGR2GRAY)
     ret, thresh = cv2.threshold(gray, 0, 255, 0)
@@ -102,22 +105,35 @@ def find_hand_farthest_point(frame, hist):
             x = np.array(largest_contour[s][:,0][:,0], dtype=np.float)
             y = np.array(largest_contour[s][:,0][:,1], dtype=np.float)
 
-            xp = cv2.pow(cv2.subtract(x, cx), 2)
-            yp = cv2.pow(cv2.subtract(y, cy), 2)
-            dist = cv2.sqrt(cv2.add(xp, yp))
+            to_delete = []
+            for i in range(len(x)):
+                if (x[i] - bill_center[0]) * (x[i] - bill_center[0])\
+                + (y[i] - bill_center[1]) * (y[i] - bill_center[1])\
+                > MAX_DISTANCE_FROM_CENTER * MAX_DISTANCE_FROM_CENTER:
+                    to_delete.append(i)
+            x = np.delete(x, to_delete)
+            y = np.delete(y, to_delete)
 
-            dist_max_i = np.argmax(dist)
+            if len(x) > 0:
+                xp = cv2.pow(cv2.subtract(x, cx), 2)
+                yp = cv2.pow(cv2.subtract(y, cy), 2)
+                dist = cv2.sqrt(cv2.add(xp, yp))
 
-            if dist_max_i < len(s):
-                farthest_defect = s[dist_max_i]
-                farthest_point = tuple(largest_contour[farthest_defect][0])
+                dist_max_i = np.argmax(dist)
+
+                if dist_max_i < len(s):
+                    farthest_defect = s[dist_max_i]
+                    farthest_point = tuple(largest_contour[farthest_defect][0])
                 
-                for cnt in contours:
-                    if cnt is not largest_contour:
-                        cv2.drawContours(hand_isolated_frame, cnt, -1, (255,0,0), 3)
-                    else:
-                        cv2.drawContours(hand_isolated_frame, cnt, -1, (0,255,0), 3)
-                
-                return dist[dist_max_i], farthest_point, hand_isolated_frame
+                    for cnt in contours:
+                        if cnt is not largest_contour:
+                            cv2.drawContours(hand_isolated_frame, cnt, -1, (255,0,0), 3)
+                        else:
+                            cv2.drawContours(hand_isolated_frame, cnt, -1, (0,255,0), 3)
+
+                        cv2.circle(hand_isolated_frame, centroid, 5, [0,255,0], -1)
+                        cv2.circle(hand_isolated_frame, farthest_point, 5, [0,0,255], -1)
+                        cv2.imshow("hand", hand_isolated_frame)
+                        return dist[dist_max_i], farthest_point, hand_isolated_frame
             
     return None, None, None

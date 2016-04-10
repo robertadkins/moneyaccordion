@@ -138,16 +138,18 @@ while(True):
                 #cx = int(M['m10']/M['m00'])
                 #cy = int(M['m01']/M['m00'])
 
-                left = frameorig[0:mean[0],:]
+                left = frameorig[:,0:mean[0]]
                 dist_left = 0
                 if len(left) != 0:
-                    dist_left, farthest_point_left, hand_isolated_frame_left = hist_utils.find_hand_farthest_point(left, hand_hist)
+                    for i in range(len(left)):
+                        summedFrame[i, mean[0], 0] = 255
+                    dist_left, farthest_point_left, hand_isolated_frame_left = hist_utils.find_hand_farthest_point(left, hand_hist, mean)
                     if farthest_point_left is not None:
                         cv2.circle(summedFrame, farthest_point_left, 5, [0,0,255], -1)
-                right = frameorig[mean[0]:,:]
+                right = frameorig[:,mean[0]:]
                 dist_right = 0
                 if len(right) != 0:
-                       dist_right, farthest_point_right, hand_isolated_frame_right = hist_utils.find_hand_farthest_point(right, hand_hist)
+                       dist_right, farthest_point_right, hand_isolated_frame_right = hist_utils.find_hand_farthest_point(right, hand_hist, mean)
                        if farthest_point_right is not None:
                            cv2.circle(summedFrame, farthest_point_right, 5, [0,255,255], -1)
                     
